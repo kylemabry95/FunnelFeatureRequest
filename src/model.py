@@ -6,8 +6,7 @@ Copyright 2022
 
 import openai
 
-# I'm trusting you with this ;)
-openai.api_key = "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"
+openai.api_key = "replace_me_with_provided_key"
 
 
 def getPrediction(email_body):
