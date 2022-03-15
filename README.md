@@ -9,6 +9,7 @@ First, create a new conda environment and install the dependencies using the `en
 ```shell
 conda env create -f environment.yml
 ```
+Request the API key for OpenAI from me at kmabry[aT]bu[doT]edu and place this in the `src/model.py` file.
 
 Next navigate to src and run app.py
 
