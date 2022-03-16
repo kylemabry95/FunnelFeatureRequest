@@ -6,7 +6,7 @@ Copyright 2022
 import json
 from model import getPrediction
 from get_email_contents import getEmailContents
-from flask import Flask, request, make_response, render_template
+from flask import Flask, request, make_response
 from werkzeug.utils import secure_filename
 
 # Start an instance of Flask
@@ -19,10 +19,14 @@ def predict():
     # Save the email to the emails directory and get a prediction
     email = request.files['email']
     email.save(app.config["UPLOAD_FOLDER"] + secure_filename(email.filename))
-    email_body = getEmailContents(email.filename)
+    email_subject, email_body = getEmailContents(email.filename)
+
+    # Run through the original model
     prediction = getPrediction(email_body)
 
-    # Generate the response in json formatY (not currently being used)
+    # Run through the new model
+
+    # Generate the response in json format (not currently being used)
     response = make_response(
         json.dumps({"Results": [
             {"Email Topic Prediction:": prediction}
