@@ -3,59 +3,45 @@ Author: Kyle Mabry
 Model that is trained on email data.
 Copyright 2022
 """
-import os
 import warnings
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, SimpleRNN
-from keras.layers.embeddings import Embedding
-from keras.layers import Dropout
 from sklearn.model_selection import train_test_split
-from get_email_contents import getEmailContents
+from get_email_contents import get_all_emails
 
-DATA_DIRECTORY = "../data/emails"
 
-# Get all email data
-all_email_headers = []
-all_email_bodies = []
-for (root, dirs, files) in os.walk(DATA_DIRECTORY):
-    for file in files:
-        header, body = getEmailContents(file)
-        all_email_headers.append(header)
-        all_email_bodies.append(body)
+def create_RNN(hidden_units, dense_units, input_shape, activation):
+    """Creates the model skeleton"""
+    model = Sequential()
+    model.add(SimpleRNN(hidden_units, input_shape=input_shape,
+                        activation=activation[0]))
+    model.add(Dense(units=dense_units, activation=activation[1]))
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    model.summary()
+    return model
 
-# convert to np array
-all_email_headers = np.asarray(all_email_headers)
-all_email_bodies = np.asarray(all_email_bodies)
-print(all_email_bodies.shape)
+
+# Get the emails from the "database"
+all_email_headers, all_email_bodies = get_all_emails()
+all_email_headers = np.reshape(all_email_headers,(all_email_headers.shape[0], all_email_headers.shape[1], 1))
+all_email_bodies = np.reshape(all_email_bodies, (all_email_bodies.shape[0], all_email_bodies.shape[1], 1))
 
 # Split the data into training and testing data
 bodies_train, bodies_test, headers_train, headers_test = train_test_split(all_email_bodies, all_email_headers, test_size=0.3, random_state=43)
+print("bodies:", bodies_train.shape)
+print("headers:", headers_train.shape)
 
 # Define the model
-body_size = 11313
-header_size = 32
-maxlen = 11313
-
-model = Sequential()
-model.add(Embedding(input_dim=body_size, output_dim=header_size, input_length = maxlen))
-model.add(SimpleRNN(header_size, return_sequences=True))
-model.add(Dropout(0.2))
-model.add(SimpleRNN(header_size, return_sequences=True))
-model.add(Dropout(0.2))
-model.add(SimpleRNN(header_size))
-model.add(Dense(2, activation='softmax'))
-model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics = ['accuracy'])
-warnings.filterwarnings("ignore")
-model.summary()
+body_size = len(bodies_train)
+maxlen = 500
 
 # fit the model to the training set
-run_information = model.fit(bodies_train, headers_train, epochs=10, validation_split=0.3)
+our_model = create_RNN(maxlen, 100, (maxlen,1), activation=['linear', 'linear'])
+run_information = our_model.fit(bodies_train, headers_train, epochs=10, validation_split=0.3)
 
 # Evaluate the model
-scores = model.evaluate(bodies_test, headers_test)
+scores = our_model.evaluate(bodies_test, headers_test)
 print("Accuracy: %.2f%%" % (scores[1] * 100))
 warnings.filterwarnings("ignore")
-
-
 
