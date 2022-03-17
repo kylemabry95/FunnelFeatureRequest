@@ -5,8 +5,9 @@ Copyright 2022
 """
 import warnings
 import numpy as np
+from keras.constraints import maxnorm
 from keras.models import Sequential
-from keras.layers import Dense, SimpleRNN
+from keras.layers import Dense, SimpleRNN, Dropout, Embedding
 from sklearn.model_selection import train_test_split
 from get_email_contents import get_all_emails
 
@@ -14,8 +15,12 @@ from get_email_contents import get_all_emails
 def create_RNN(hidden_units, dense_units, input_shape, activation):
     """Creates the model skeleton"""
     model = Sequential()
-    model.add(SimpleRNN(hidden_units, input_shape=input_shape,
-                        activation=activation[0]))
+    model.add(Embedding(input_dim=149056, output_dim=32, input_length=hidden_units))
+    model.add(SimpleRNN(hidden_units, return_sequences=True, input_shape=input_shape, activation=activation[0]))
+    model.add(Dropout(0.2))
+    model.add(SimpleRNN(hidden_units, return_sequences=True, input_shape=input_shape, activation=activation[0]))
+    model.add(Dropout(0.2))
+    model.add(SimpleRNN(hidden_units,input_shape=input_shape, activation=activation[0]))
     model.add(Dense(units=dense_units, activation=activation[1]))
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.summary()
@@ -24,7 +29,7 @@ def create_RNN(hidden_units, dense_units, input_shape, activation):
 
 # Get the emails from the "database"
 all_email_headers, all_email_bodies = get_all_emails()
-all_email_headers = np.reshape(all_email_headers,(all_email_headers.shape[0], all_email_headers.shape[1], 1))
+all_email_headers = np.reshape(all_email_headers, (all_email_headers.shape[0], all_email_headers.shape[1], 1))
 all_email_bodies = np.reshape(all_email_bodies, (all_email_bodies.shape[0], all_email_bodies.shape[1], 1))
 
 # Split the data into training and testing data

@@ -76,6 +76,7 @@ def get_all_emails():
     maxlen_body = 500
     all_email_headers = pad_sequences(sequences_headers, maxlen=maxlen_header)
     all_email_bodies = pad_sequences(sequences_bodies, maxlen=maxlen_body)
+
     print("Shape of headers:", all_email_headers.shape)
     print("Shape of body:", all_email_bodies.shape)
 
