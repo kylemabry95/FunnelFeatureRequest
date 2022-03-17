@@ -5,7 +5,6 @@ Copyright 2022
 """
 import warnings
 import numpy as np
-from keras.constraints import maxnorm
 from keras.models import Sequential
 from keras.layers import Dense, SimpleRNN, Dropout, Embedding
 from sklearn.model_selection import train_test_split
@@ -43,10 +42,10 @@ maxlen = 500
 
 # fit the model to the training set
 our_model = create_RNN(maxlen, 100, (maxlen,1), activation=['linear', 'linear'])
-run_information = our_model.fit(bodies_train, headers_train, epochs=10, validation_split=0.3)
+run_information = our_model.fit(bodies_train, headers_train, epochs=2, validation_split=0.3)
 
 # Evaluate the model
 scores = our_model.evaluate(bodies_test, headers_test)
-print("Accuracy: %.2f%%" % (scores[1] * 100))
+print("Accuracy: %.2f%%" % (scores * 100))
 warnings.filterwarnings("ignore")
 

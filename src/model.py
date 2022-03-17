@@ -3,7 +3,6 @@ Author: Kyle Mabry
 Creates a model that can determine the topic of an email given the email's body.
 Copyright 2022
 """
-
 import openai
 
 openai.api_key = "replace_me_with_provided_key"

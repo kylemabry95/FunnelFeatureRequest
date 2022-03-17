@@ -25,6 +25,7 @@ def predict():
     prediction = getPrediction(email_body)
 
     # Run through the new model
+    #TODO add code that runs through version 2 of the model and returs results
 
     # Generate the response in json format (not currently being used)
     response = make_response(
